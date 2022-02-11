@@ -3,24 +3,69 @@ import React, { useState } from "react";
 const Login = () => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState({});
+  var processToken = token.access_token;
 
-  const mauricio = (e) => {
+  const getUser = (e) => {
     setUser(e.target.value);
   };
-  const fabricio = (e) => {
+  const getPassword = (e) => {
     setPassword(e.target.value);
   };
-  const patricio = () => {
+  const getToken = () => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      username: user,
+      password: password,
+    });
+
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(
+      "https://3001-fsdexter-jwt-kht08cvggs0.ws-eu31.gitpod.io/api/token",
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => setToken(result))
+      .catch((error) => console.log("error", error));
+
     console.log("hi");
     console.log(user, password);
+  };
+
+  const enterProtected = () => {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + processToken);
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    fetch(
+      "https://3001-fsdexter-jwt-kht08cvggs0.ws-eu31.gitpod.io/api/protected",
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => alert("you are in a restricted area"))
+      .catch((error) => console.log("error", error));
   };
 
   return (
     <>
       <h1>Login</h1>
-      <input type="text" placeholder="user" onChange={mauricio}></input>
-      <input type="text" placeholder="password" onChange={fabricio}></input>
-      <button onClick={patricio}>submit</button>
+      <input type="text" placeholder="user" onChange={getUser}></input>
+      <input type="text" placeholder="password" onChange={getPassword}></input>
+      <button onClick={getToken}>submit</button>
+      <button onClick={enterProtected}>enter</button>
     </>
   );
 };
